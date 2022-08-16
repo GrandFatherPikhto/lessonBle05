@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name" translatable="false">LessonBle05</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="scan_fragment_label">Scan BLE Devices</string>
+    <string name="device_fragment_label">BLE Device</string>
+    <string name="scan_start">Start Scan</string>
+    <string name="scan_stop">Stop Scan</string>
+    <string name="scan_error">Scan Error %1$d</string>
+    <string name="rssi_title" translatable="false">RSSI: %1$d</string>
+    <string name="device_connect">Connect</string>
+    <string name="device_disconnect">Disconnect</string>
+    <string name="device_pairing">Pairing Device</string>
+    <string name="to_scan_fragment">Go To Scan Fragment</string>
+    <string name="description_bond">Bond State BLE Device</string>
+    <string name="description_connectable">Is BLE Device Connectable</string>
+    <string name="unknown_device">Unknown Device</string>
+    <string name="default_address" translatable="false">00:00:00:00:00:00</string>
+    <string name="default_uuid" translatable="false">123e4567-e89b-12d3-a456-426614174000</string>
+    <string name="permission_granted">Permission %1$s is granted</string>
+    <string name="permission_not_granted">Permission on %1$s is not granted</string>
+    <string name="characteristic_name">Characteristic name</string>
+    <string name="service_name">Service Name</string>
+    <string name="descriptor_name">Descriptor Name</string>
+    <string name="characteristic_type">Characteristic Type</string>
+    <string name="characteristic_property">Characteristic Property</string>
+    <string name="characteristic_value">Characteristic Value</string>
+    <string name="uuid_title" translatable="false">UUID</string>
+    <string name="characteristic_write_type">Characteristic Write Type</string>
+    <string name="descriptor_value">Descriptor Value</string>
+    <string name="service_type">Service Type</string>
+    <string name="description_up_down">Up/Down service characteristics/descriptors</string>
+    <string name="ib_characteristic_read">Read Characteristic Value</string>
+    <string name="ib_characteristic_write">Write Characteristic Value</string>
+    <string name="ib_characteristic_notify_enable_disable">Characteristic Notify Enable/Disable</string>
+    <string name="custom_service">Custom Service</string>
+    <string name="service_primary">Primary Service</string>
+    <string name="service_secondary">Secondary Service</string>
+    <string name="custom_characteristic">Custom Characteristic</string>
+    <string name="characteristic_property_broadcast">Broadcast</string>
+    <string name="characteristic_property_extended_props">Extended Properties</string>
+    <string name="characteristic_property_read">Read</string>
+    <string name="characteristic_property_indicate">Indicate</string>
+    <string name="characteristic_property_notify">Notify</string>
+    <string name="characteristic_property_write">Write</string>
+    <string name="characteristic_property_signed_write">Signed Write</string>
+    <string name="characteristic_property_write_no_response">Write without response</string>
+    <string name="characteristic_permission_read">Read</string>
+    <string name="characteristic_permission_read_encrypted">Encrypted Read</string>
+    <string name="characteristic_permission_read_encrypted_mitm">Reading with person-in-the-middle protection</string>
+    <string name="characteristic_permission_write">Write</string>
+    <string name="characteristic_permission_write_encrypted">Write Encrypted</string>
+    <string name="characteristic_permission_write_signed">Allow encrypted writes with person-in-the-middle protection</string>
+    <string name="characteristic_permission_write_signed_mitm">Allow signed write operations with person-in-the-middle protection</string>
+    <string name="characteristic_permission_write_encrypted_mitm">Allow signed encrypted write operations with MITM</string>
+    <string name="characteristic_properties">Characteristic Properties</string>
+    <string name="characteristic_permissions">Characteristic Permissions</string>
+    <string name="service_uuid">Service UUID</string>
+    <string name="characteristic_uuid">Characteristic UUID</string>
+    <string name="write_value">Write Value</string>
+    <string name="write_cancell">Cancell</string>
+    <string name="format_text">Format Text</string>
+    <string name="format_bytes">Format Bytes</string>
+    <string name="format_integer">Format Integer</string>
+    <string name="format_float">Format Float</string>
+    <string name="hex">Hex</string>
+    <string name="ib_value_format">Value Format</string>
+    <string name="error_bytes">Error in bytes string: %1$s</string>
+    <string name="error_float">Error parsing float number: %1$s</string>
+    <string name="ib_read_descriptor">Read Descriptor Value</string>
+    <string name="ib_descriptor_value_format">Descriptor Value Format</string>
+    <string name="names_filter">Filter Device Names</string>
+    <string name="addresses_filter">Filter Addresses of Device</string>
+    <string name="filter_header">Filters</string>
+    <string name="custom_descriptor">Custom Descriptor</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+</resources>
