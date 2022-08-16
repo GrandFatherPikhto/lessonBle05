@@ -105,10 +105,10 @@ class MainActivity : AppCompatActivity() {
             fake = extras.getBoolean(FAKE, false)
         }
 
-        if (fake) {
-            bleManager = FakeBleManager()
+        bleManager = if (fake) {
+            FakeBleManager()
         } else {
-            bleManager = BleManager(applicationContext)
+            BleManager(applicationContext)
         }
         (applicationContext as LessonBle05App).bleManager = bleManager
         lifecycle.addObserver(bleManager)
