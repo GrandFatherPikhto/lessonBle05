@@ -1,5 +1,6 @@
 package com.pikhto.blin
 
+import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -11,7 +12,7 @@ import com.pikhto.blin.data.BleScanResult
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface BleManagerInterface : DefaultLifecycleObserver {
+interface BleManagerInterface {
     val stateFlowScanState:StateFlow<BleScanManager.State>
     val scanState:BleScanManager.State
 
@@ -26,8 +27,8 @@ interface BleManagerInterface : DefaultLifecycleObserver {
 
     val sharedFlowConnectStateCode: SharedFlow<Int>
 
-    val stateFlowBleGatt: StateFlow<BleGatt?>
-    val bleGatt: BleGatt?
+    val stateFlowBluetoothGatt: StateFlow<BluetoothGatt?>
+    val bluetoothGatt: BluetoothGatt?
 
     val sharedFlowCharacteristic: SharedFlow<BluetoothGattCharacteristic>
     val sharedFlowDescriptor: SharedFlow<BluetoothGattDescriptor>
@@ -37,6 +38,8 @@ interface BleManagerInterface : DefaultLifecycleObserver {
 
     val sharedFlowCharacteristicNotify: SharedFlow<BleCharacteristicNotify>
     val notifiedCharacteristic:List<BluetoothGattCharacteristic>
+
+    fun onDestroy()
 
     fun bondRequest(address: String): Boolean
 

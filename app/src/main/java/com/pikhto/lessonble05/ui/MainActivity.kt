@@ -13,13 +13,14 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.pikhto.blin.BleManager
 import com.pikhto.blin.BleManagerInterface
 import com.pikhto.blin.permissions.RequestPermissions
 import com.pikhto.lessonble05.LessonBle05App
 import com.pikhto.lessonble05.R
+import com.pikhto.lessonble05.blemanager.AppBleManager
+import com.pikhto.lessonble05.blemanager.MainBleManager
 import com.pikhto.lessonble05.databinding.ActivityMainBinding
-import com.pikhto.lessonble05.fake.FakeBleManager
+import com.pikhto.lessonble05.blemanager.FakeBleManager
 import com.pikhto.lessonble05.helper.linkMenu
 import com.pikhto.lessonble05.models.MainActivityViewModel
 import kotlinx.coroutines.flow.filterNotNull
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var bleManager:BleManagerInterface
+    private lateinit var bleManager : AppBleManager
 
     private val mainActivityViewModel by viewModels<MainActivityViewModel>()
 
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         linkMenu(false, menuProvider)
+        bleManager.onDestroy()
         super.onDestroy()
     }
 
@@ -106,11 +108,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         bleManager = if (fake) {
-            FakeBleManager()
+            FakeBleManager(applicationContext)
         } else {
-            BleManager(applicationContext)
+            MainBleManager(applicationContext)
         }
+
         (applicationContext as LessonBle05App).bleManager = bleManager
-        lifecycle.addObserver(bleManager)
     }
 }

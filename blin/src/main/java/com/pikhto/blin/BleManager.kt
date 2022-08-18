@@ -13,12 +13,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 
-class BleManager constructor(private val context: Context,
+abstract class BleManager constructor(private val context: Context,
                              dispatcher: CoroutineDispatcher = Dispatchers.IO)
     : BleManagerInterface {
 
     private val logTag = this.javaClass.simpleName
-    private val scope = CoroutineScope(dispatcher)
+    val scope = CoroutineScope(dispatcher)
 
     val applicationContext:Context get() = context.applicationContext
 
@@ -41,8 +41,8 @@ class BleManager constructor(private val context: Context,
 
     override val sharedFlowConnectStateCode get() = bleGattManager.stateFlowConnectStateCode
 
-    override val stateFlowBleGatt get() = bleGattManager.stateFlowBleGatt
-    override val bleGatt get() = bleGattManager.bleGatt
+    override val stateFlowBluetoothGatt get() = bleGattManager.stateFlowBluetoothGatt
+    override val bluetoothGatt get() = bleGattManager.bluetoothGatt
 
     override val sharedFlowCharacteristic: SharedFlow<BluetoothGattCharacteristic>
         get() = bleGattManager.sharedFlowCharacteristic
@@ -60,11 +60,13 @@ class BleManager constructor(private val context: Context,
     override fun bondRequest(address: String)
             = bleBondManager.bondRequest(address)
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        owner.lifecycle.addObserver(bleScanManager)
-        owner.lifecycle.addObserver(bleGattManager)
-        owner.lifecycle.addObserver(bleBondManager)
+    init {
+    }
+
+    override fun onDestroy() {
+        bleScanManager.onDestroy()
+        bleGattManager.onDestroy()
+        bleBondManager.onDestroy()
     }
 
     override

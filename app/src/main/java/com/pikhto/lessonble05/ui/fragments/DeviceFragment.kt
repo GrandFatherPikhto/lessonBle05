@@ -13,8 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.pikhto.blin.*
 import com.pikhto.lessonble05.LessonBle05App
 import com.pikhto.lessonble05.R
+import com.pikhto.lessonble05.blemanager.AppBleManager
 import com.pikhto.lessonble05.databinding.FragmentDeviceBinding
 import com.pikhto.lessonble05.helper.linkMenu
+import com.pikhto.lessonble05.helper.linkMenuProvider
+import com.pikhto.lessonble05.helper.unlinkMenuProvider
 import com.pikhto.lessonble05.models.*
 import com.pikhto.lessonble05.ui.fragments.adapters.RvBleDeviceAdapter
 import kotlinx.coroutines.flow.filterNotNull
@@ -35,7 +38,7 @@ class DeviceFragment : Fragment() {
     private val mainActivityViewModel by activityViewModels<MainActivityViewModel>()
     private val deviceViewModel by viewModels<DeviceViewModel>()
 
-    private val _bleManager: BleManagerInterface? by lazy {
+    private val _bleManager: AppBleManager? by lazy {
         (requireActivity().application as LessonBle05App).bleManager
     }
     private val bleManager get() = _bleManager!!
@@ -111,7 +114,7 @@ class DeviceFragment : Fragment() {
             }
         }
 
-        linkMenu(true, menuProvider)
+        linkMenuProvider(menuProvider)
         binding.apply {
             rvServices.adapter = rvBleDeviceAdapter
             rvServices.layoutManager = LinearLayoutManager(requireContext())
@@ -230,10 +233,14 @@ class DeviceFragment : Fragment() {
         }
     }
 
+    override fun onPause() {
+        bleManager.disconnect()
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        bleManager.disconnect()
-        linkMenu(false, menuProvider)
+        unlinkMenuProvider(menuProvider)
         _binding = null
     }
 }

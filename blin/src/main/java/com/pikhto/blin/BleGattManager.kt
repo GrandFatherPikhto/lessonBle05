@@ -21,8 +21,7 @@ import java.util.*
 
 class BleGattManager constructor(private val context: Context,
                                  private val bleScanManager: BleScanManager,
-                                 dispatcher: CoroutineDispatcher = Dispatchers.IO)
-    : DefaultLifecycleObserver {
+                                 dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
     companion object {
         const val MAX_ATTEMPTS = 6
@@ -75,13 +74,9 @@ class BleGattManager constructor(private val context: Context,
     private val mutableSharedFlowConnectStateCode = MutableSharedFlow<Int>(replay = 100)
     val stateFlowConnectStateCode get() = mutableSharedFlowConnectStateCode.asSharedFlow()
 
-    private val mutableStateFlowGatt = MutableStateFlow<BluetoothGatt?>(null)
-    val stateFlowGatt get() = mutableStateFlowGatt.asStateFlow()
-    val bluetoothGatt:BluetoothGatt? get() = mutableStateFlowGatt.value
-
-    private val mutableStateFlowBleGatt = MutableStateFlow<BleGatt?>(null)
-    val stateFlowBleGatt get() = mutableStateFlowBleGatt.asStateFlow()
-    val bleGatt get() = mutableStateFlowBleGatt.value
+    private val mutableStateFlowBluetoothGatt = MutableStateFlow<BluetoothGatt?>(null)
+    val stateFlowBluetoothGatt get() = mutableStateFlowBluetoothGatt.asStateFlow()
+    val bluetoothGatt:BluetoothGatt? get() = mutableStateFlowBluetoothGatt.value
 
     private val mutableListNotifiedCharacteristic = mutableListOf<BluetoothGattCharacteristic>()
     val notifiedCharacteristic get() = mutableListNotifiedCharacteristic.toList()
@@ -110,9 +105,8 @@ class BleGattManager constructor(private val context: Context,
         }
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
+    fun onDestroy() {
         disconnect()
-        super.onDestroy(owner)
     }
 
     /**
@@ -211,8 +205,7 @@ class BleGattManager constructor(private val context: Context,
         Log.d(tagLog, "onGattDiscovered(status = )")
         if (status == BluetoothGatt.GATT_SUCCESS) {
             discoveredGatt?.let {
-                mutableStateFlowGatt.tryEmit(it)
-                mutableStateFlowBleGatt.tryEmit(BleGatt(it))
+                mutableStateFlowBluetoothGatt.tryEmit(it)
                 mutableStateFlowConnectState.tryEmit(State.Connected)
             }
         }
@@ -224,8 +217,7 @@ class BleGattManager constructor(private val context: Context,
             when (newState) {
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     mutableStateFlowConnectState.tryEmit(State.Disconnected)
-                    mutableStateFlowGatt.tryEmit(null)
-                    mutableStateFlowBleGatt.tryEmit(null)
+                    mutableStateFlowBluetoothGatt.tryEmit(null)
                 }
                 BluetoothProfile.STATE_CONNECTED -> {
                     gatt?.let {

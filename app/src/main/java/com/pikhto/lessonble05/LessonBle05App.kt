@@ -1,8 +1,8 @@
 package com.pikhto.lessonble05
 
 import android.app.Application
-import com.pikhto.blin.BleManagerInterface
+import com.pikhto.lessonble05.blemanager.AppBleManager
 
 class LessonBle05App : Application() {
-    var bleManager: BleManagerInterface? = null
+    var bleManager: AppBleManager? = null
 }

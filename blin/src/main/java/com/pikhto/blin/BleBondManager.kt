@@ -19,8 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class BleBondManager (private val context: Context,
-                      private val dispatcher: CoroutineDispatcher = Dispatchers.IO)
-    : DefaultLifecycleObserver {
+                      private val dispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
     private val logTag = this.javaClass.simpleName
 
@@ -52,17 +51,12 @@ class BleBondManager (private val context: Context,
     }
 
     init {
-    }
-
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
         applicationContext.applicationContext.registerReceiver(bcBondReceiver,
             makeIntentFilter())
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
+    fun onDestroy() {
         applicationContext.unregisterReceiver(bcBondReceiver)
-        super.onDestroy(owner)
     }
 
     /**
@@ -84,14 +78,14 @@ class BleBondManager (private val context: Context,
     private fun bondRequest(bluetoothDevice: BluetoothDevice) : Boolean {
         Log.d(logTag, "bondRequest(${bluetoothDevice.address})")
         if(bluetoothDevice.bondState == BluetoothDevice.BOND_BONDED) {
-            mutableStateFlowBleBondState.tryEmit(BleBondState(BleDevice(bluetoothDevice), State.Bonded))
+            mutableStateFlowBleBondState.tryEmit(BleBondState(bluetoothDevice, State.Bonded))
         } else {
             requestDevice = bluetoothDevice
             if (bluetoothDevice.createBond()) {
-                mutableStateFlowBleBondState.tryEmit(BleBondState(BleDevice(bluetoothDevice), State.Request))
+                mutableStateFlowBleBondState.tryEmit(BleBondState(bluetoothDevice, State.Request))
                 return true
             } else {
-                mutableStateFlowBleBondState.tryEmit(BleBondState(BleDevice(bluetoothDevice), State.Error))
+                mutableStateFlowBleBondState.tryEmit(BleBondState(bluetoothDevice, State.Error))
             }
         }
 
@@ -113,17 +107,24 @@ class BleBondManager (private val context: Context,
      * BluetoothDevice.BOND_BONDING 11
      * BluetoothDevice.BOND_BONDED  12
      */
+    @SuppressLint("MissingPermission")
     fun onSetBondingDevice(bluetoothDevice: BluetoothDevice?, oldState: Int, newState: Int) {
         bluetoothDevice?.let { device ->
             if (device == requestDevice) {
                 Log.d(logTag, "onSetBondingDevice($bluetoothDevice, $oldState, $newState)")
                 when(newState) {
                     BluetoothDevice.BOND_BONDING -> { mutableStateFlowBleBondState
-                        .tryEmit(BleBondState(BleDevice(bluetoothDevice), State.Bonding)) }
-                    BluetoothDevice.BOND_BONDED -> { mutableStateFlowBleBondState
-                        .tryEmit(BleBondState(BleDevice(bluetoothDevice), State.Bonded)) }
-                    BluetoothDevice.BOND_NONE -> { mutableStateFlowBleBondState
-                        .tryEmit(BleBondState(BleDevice(bluetoothDevice), State.Reject)) }
+                        .tryEmit(BleBondState(bluetoothDevice, State.Bonding)) }
+                    BluetoothDevice.BOND_BONDED -> {
+                        bluetoothAdapter.bondedDevices.add(bluetoothDevice)
+                        mutableStateFlowBleBondState
+                        .tryEmit(BleBondState(bluetoothDevice, State.Bonded))
+                    }
+                    BluetoothDevice.BOND_NONE -> {
+                        bluetoothAdapter.bondedDevices.remove(bluetoothDevice)
+                        mutableStateFlowBleBondState
+                        .tryEmit(BleBondState(bluetoothDevice, State.Reject))
+                    }
                     else -> { Log.d(logTag, "Unknown State: $newState")}
                 }
             }

@@ -16,10 +16,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.pikhto.lessonble05.R
 import com.pikhto.blescan.helper.withDrawable
 import com.pikhto.lessonble05.LessonBle05App
-import com.pikhto.lessonble05.fake.FakeBleManager
+import com.pikhto.lessonble05.blemanager.FakeBleManager
 import com.pikhto.lessonble05.ui.MainActivity
-
-import org.junit.Assert.*
 
 import org.junit.After
 import org.junit.Before

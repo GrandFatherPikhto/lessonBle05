@@ -10,6 +10,7 @@ import com.pikhto.blin.BleManagerInterface
 import com.pikhto.blin.buffer.BleCharacteristicNotify
 import com.pikhto.blin.data.BleBondState
 import com.pikhto.blin.data.BleGatt
+import com.pikhto.lessonble05.blemanager.AppBleManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -50,7 +51,7 @@ class DeviceViewModel: ViewModel () {
 
     var connected = false
 
-    fun changeBleManager(bleManager: BleManagerInterface) {
+    fun changeBleManager(bleManager: AppBleManager) {
         viewModelScope.launch {
             bleManager.stateFlowConnectState.collect {
                 mutableStateFlowConnectState.tryEmit(it)

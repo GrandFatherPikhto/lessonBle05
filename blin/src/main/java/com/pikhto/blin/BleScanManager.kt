@@ -24,8 +24,7 @@ import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BleScanManager constructor(private val context: Context,
-                                 ioDispatcher: CoroutineDispatcher = Dispatchers.IO)
-    : DefaultLifecycleObserver {
+                                 ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
     private val bcScanReceiver: BcScanReceiver = BcScanReceiver(this)
 
@@ -152,17 +151,13 @@ class BleScanManager constructor(private val context: Context,
         }
     }
 
-
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        Log.d(tagLog, "onCreate()")
+    init {
         applicationContext.registerReceiver(bcScanReceiver, makeIntentFilters())
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
+    fun onDestroy() {
         applicationContext.unregisterReceiver(bcScanReceiver)
         stopScan()
-        super.onDestroy(owner)
     }
 
     private fun initScanFilters() {
