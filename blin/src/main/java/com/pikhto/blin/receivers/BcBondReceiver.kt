@@ -4,11 +4,11 @@ import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.pikhto.blin.BleBondManager
+import com.pikhto.blin.orig.AbstractBleBondManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-class BcBondReceiver constructor(private val bleBondManager: BleBondManager,
+class BcBondReceiver constructor(private val bleBondManager: AbstractBleBondManager,
                                  private val dispatcher: CoroutineDispatcher = Dispatchers.IO)
     : BroadcastReceiver() {
 

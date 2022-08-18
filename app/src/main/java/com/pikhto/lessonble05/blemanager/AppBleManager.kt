@@ -1,18 +1,26 @@
 package com.pikhto.lessonble05.blemanager
 
 import android.content.Context
-import com.pikhto.blin.BleManager
-import com.pikhto.blin.data.BleGatt
+import com.pikhto.blin.orig.AbstractBleManager
+import com.pikhto.lessonble05.data.BleGatt
+import com.pikhto.lessonble05.data.BleScanResult
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-abstract class AppBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatchers.IO) :
-    BleManager(context) {
+abstract class AppBleManager(context: Context) :
+    AbstractBleManager(context) {
 
     private val mutableStateFlowBleGatt = MutableStateFlow<BleGatt?>(null)
     val stateFlowBleGatt = mutableStateFlowBleGatt.asStateFlow()
     val bleGatt get() = mutableStateFlowBleGatt.value
+
+    val mutableSharedFlowBleScanResult = MutableSharedFlow<BleScanResult>(replay = 100)
+    val sharedFlowBleScanResult get() = mutableSharedFlowBleScanResult.asSharedFlow()
+
+    val bleScanResults by lazy { scanResults.map { BleScanResult(it) } }
 
     init {
         scope.launch {
@@ -24,5 +32,22 @@ abstract class AppBleManager(context: Context, dispatcher: CoroutineDispatcher =
                 }
             }
         }
+
+        scope.launch {
+            sharedFlowScanResults.collect {
+                mutableSharedFlowBleScanResult.tryEmit(BleScanResult(it))
+            }
+        }
+    }
+
+    fun changeBleGatt(bleGatt: BleGatt?) {
+        mutableStateFlowBleGatt.tryEmit(bleGatt)
+    }
+
+    open fun connectBle(address: String): BleGatt? {
+        super.connect(address)?.let { bluetoothGatt ->
+            return BleGatt(bluetoothGatt)
+        }
+        return null
     }
 }

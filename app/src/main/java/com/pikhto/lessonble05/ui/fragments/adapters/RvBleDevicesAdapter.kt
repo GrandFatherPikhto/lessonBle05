@@ -4,8 +4,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.pikhto.blin.data.BleScanResult
 import com.pikhto.lessonble05.R
+import com.pikhto.lessonble05.data.BleScanResult
 import com.pikhto.lessonble05.helper.OnClickItemListener
 import com.pikhto.lessonble05.helper.OnLongClickItemListener
 

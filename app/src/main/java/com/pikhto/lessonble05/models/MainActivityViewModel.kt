@@ -1,7 +1,7 @@
 package com.pikhto.lessonble05.models
 
 import androidx.lifecycle.ViewModel
-import com.pikhto.blin.data.BleScanResult
+import com.pikhto.lessonble05.data.BleScanResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

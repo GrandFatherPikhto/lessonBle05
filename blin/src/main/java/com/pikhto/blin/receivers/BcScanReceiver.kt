@@ -7,12 +7,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.pikhto.blin.BleScanManager
+import com.pikhto.blin.orig.AbstractBleScanManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-class BcScanReceiver constructor(private val bleScanManager: BleScanManager, dispatcher: CoroutineDispatcher = Dispatchers.IO): BroadcastReceiver() {
+class BcScanReceiver constructor(private val bleScanManager: AbstractBleScanManager, dispatcher: CoroutineDispatcher = Dispatchers.IO): BroadcastReceiver() {
     companion object {
         const val ACTION_BLE_SCAN = "com.pikhto.blescan.ACTION_BLE_SCAN"
         const val REQUEST_CODE_BLE_SCANNER_PENDING_INTENT = 1000

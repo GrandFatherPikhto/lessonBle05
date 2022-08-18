@@ -10,12 +10,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.pikhto.blin.*
+import com.pikhto.blin.orig.AbstractBleBondManager
+import com.pikhto.blin.orig.AbstractBleGattManager
 import com.pikhto.lessonble05.LessonBle05App
 import com.pikhto.lessonble05.R
 import com.pikhto.lessonble05.blemanager.AppBleManager
 import com.pikhto.lessonble05.databinding.FragmentDeviceBinding
-import com.pikhto.lessonble05.helper.linkMenu
 import com.pikhto.lessonble05.helper.linkMenuProvider
 import com.pikhto.lessonble05.helper.unlinkMenuProvider
 import com.pikhto.lessonble05.models.*
@@ -52,11 +52,11 @@ class DeviceFragment : Fragment() {
                 lifecycleScope.launch {
                     deviceViewModel.stateFlowConnectState.collect { state ->
                         when(state) {
-                            BleGattManager.State.Disconnected -> {
+                            AbstractBleGattManager.State.Disconnected -> {
                                 actionConnect.setIcon(R.drawable.ic_connect)
                                 actionConnect.title = getString(R.string.device_connect)
                             }
-                            BleGattManager.State.Connected -> {
+                            AbstractBleGattManager.State.Connected -> {
                                 actionConnect.setIcon(R.drawable.ic_disconnect)
                                 actionConnect.title = getString(R.string.device_disconnect)
                             }
@@ -71,11 +71,11 @@ class DeviceFragment : Fragment() {
             return when(menuItem.itemId) {
                 R.id.action_connect -> {
                     when(deviceViewModel.connectState) {
-                        BleGattManager.State.Connected -> {
+                        AbstractBleGattManager.State.Connected -> {
                             bleManager.disconnect()
                             deviceViewModel.connected = false
                         }
-                        BleGattManager.State.Disconnected -> {
+                        AbstractBleGattManager.State.Disconnected -> {
                             mainActivityViewModel.scanResult?.let { scanResult ->
                                 Log.d(tagLog, "Try Connecting(${scanResult.device.address})")
                                 bleManager.connect(scanResult.device.address)
@@ -143,11 +143,11 @@ class DeviceFragment : Fragment() {
         lifecycleScope.launch {
             deviceViewModel.stateFlowConnectState.collect { state ->
                 when(state) {
-                    BleGattManager.State.Disconnected -> {
+                    AbstractBleGattManager.State.Disconnected -> {
                         binding.ivBleConnected.setImageResource(R.drawable.ic_connect_big)
                     }
 
-                    BleGattManager.State.Connected -> {
+                    AbstractBleGattManager.State.Connected -> {
                         binding.ivBleConnected.setImageResource(R.drawable.ic_disconnect_big)
                     }
 
@@ -158,11 +158,11 @@ class DeviceFragment : Fragment() {
 
         binding.ivBleConnected.setOnClickListener { _ ->
             when(deviceViewModel.connectState) {
-                BleGattManager.State.Connected -> {
+                AbstractBleGattManager.State.Connected -> {
                     bleManager.disconnect()
                     deviceViewModel.connected = false
                 }
-                BleGattManager.State.Disconnected -> {
+                AbstractBleGattManager.State.Disconnected -> {
                     mainActivityViewModel.scanResult?.let { scanResult ->
                         bleManager.connect(scanResult.device.address)
                         deviceViewModel.connected = true
@@ -182,9 +182,9 @@ class DeviceFragment : Fragment() {
 
         lifecycleScope.launch {
             deviceViewModel.stateFlowBondState.filterNotNull().collect { bondState ->
-                if (bondState.state == BleBondManager.State.Bonded) {
+                if (bondState.state == AbstractBleBondManager.State.Bonded) {
                     binding.ivBlePaired.setImageResource(R.drawable.ic_paired)
-                } else if (bondState.state == BleBondManager.State.Reject) {
+                } else if (bondState.state == AbstractBleBondManager.State.Reject) {
                     binding.ivBlePaired.setImageResource(R.drawable.ic_error)
                 }
             }

@@ -4,6 +4,5 @@ import android.content.Context
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-class MainBleManager (context: Context, dispatcher: CoroutineDispatcher = Dispatchers.IO)
-    : AppBleManager(context, dispatcher) {
-}
+class MainBleManager (context: Context)
+    : AppBleManager(context)

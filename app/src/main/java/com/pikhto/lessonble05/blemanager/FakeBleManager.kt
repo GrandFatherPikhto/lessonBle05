@@ -3,37 +3,33 @@ package com.pikhto.lessonble05.blemanager
 import android.bluetooth.*
 import android.content.Context
 import android.util.Log
-import com.pikhto.blin.BleGattManager
-import com.pikhto.blin.BleManager
-import com.pikhto.blin.BleManagerInterface
-import com.pikhto.blin.BleScanManager
+import com.pikhto.blin.orig.AbstractBleGattManager
+import com.pikhto.blin.orig.AbstractBleScanManager
 import com.pikhto.blin.buffer.BleCharacteristicNotify
 import com.pikhto.blin.data.BleGattItem
 import com.pikhto.blin.data.*
 import com.pikhto.blin.idling.ConnectingIdling
 import com.pikhto.blin.idling.DisconnectingIdling
 import com.pikhto.blin.idling.ScanIdling
+import com.pikhto.lessonble05.data.BleDevice
+import com.pikhto.lessonble05.data.BleGatt
+import com.pikhto.lessonble05.data.BleScanResult
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.random.Random
 
-class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatchers.IO) : AppBleManager (context, dispatcher) {
+class FakeBleManager(context: Context) : AppBleManager (context) {
 
     private val logTag = this.javaClass.simpleName
 
-    private val mutableStateFlowScanState = MutableStateFlow(BleScanManager.State.Stopped)
-    override val stateFlowScanState: StateFlow<BleScanManager.State>
+    private val mutableStateFlowScanState = MutableStateFlow(AbstractBleScanManager.State.Stopped)
+    override val stateFlowScanState: StateFlow<AbstractBleScanManager.State>
         get() = mutableStateFlowScanState.asStateFlow()
-    override val scanState: BleScanManager.State
+    override val scanState: AbstractBleScanManager.State
         get() = mutableStateFlowScanState.value
 
-    private val mutableScanResults = mutableListOf<BleScanResult>()
-    private val mutableSharedFlowScanResult = MutableSharedFlow<BleScanResult>(replay = 100)
-    override val sharedFlowBleScanResult: SharedFlow<BleScanResult>
-        get() = mutableSharedFlowScanResult.asSharedFlow()
-    override val scanResults: List<BleScanResult>
-        get() = mutableScanResults.toList()
+    private val mutableBleScanResults = mutableListOf<BleScanResult>()
 
     private val mutableFlowScanError = MutableStateFlow(-1)
     override val stateFlowScanError: StateFlow<Int>
@@ -41,10 +37,10 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
     override val scanError: Int
         get() = mutableFlowScanError.value
 
-    private val mutableStateFlowConnectState = MutableStateFlow(BleGattManager.State.Disconnected)
-    override val stateFlowConnectState: StateFlow<BleGattManager.State>
+    private val mutableStateFlowConnectState = MutableStateFlow(AbstractBleGattManager.State.Disconnected)
+    override val stateFlowConnectState: StateFlow<AbstractBleGattManager.State>
         get() = mutableStateFlowConnectState.asStateFlow()
-    override val connectState: BleGattManager.State
+    override val connectState: AbstractBleGattManager.State
         get() = mutableStateFlowConnectState.value
 
     private val mutableSharedFlowStateCode = MutableStateFlow(-1)
@@ -94,12 +90,12 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
         stopTimeout: Long
     ): Boolean {
         Log.d(logTag, "startScan($scanState)")
-        if (scanState != BleScanManager.State.Scanning) {
-            mutableStateFlowScanState.tryEmit(BleScanManager.State.Scanning)
+        if (scanState != AbstractBleScanManager.State.Scanning) {
+            mutableStateFlowScanState.tryEmit(AbstractBleScanManager.State.Scanning)
             scope.launch {
                 (1..10).forEach { i ->
                     delay(Random.nextLong(200, 1000))
-                    mutableSharedFlowScanResult.tryEmit(
+                    mutableSharedFlowBleScanResult.tryEmit(
                         BleScanResult(
                             BleDevice(Random.nextBytes(6)
                                 .joinToString (":") { String.format("%02X", it) },
@@ -107,7 +103,7 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
                                 if (Random.nextBoolean()) BluetoothDevice.BOND_BONDED else BluetoothDevice.BOND_NONE),
                             Random.nextBoolean(),
                             Random.nextInt(-100, 0)))
-                    if (scanState != BleScanManager.State.Scanning) return@forEach
+                    if (scanState != AbstractBleScanManager.State.Scanning) return@forEach
                 }
                 stopScan()
             }
@@ -118,7 +114,7 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
     init {
         scope.launch {
             sharedFlowBleScanResult.collect {
-                mutableScanResults.add(it)
+                mutableBleScanResults.add(it)
             }
         }
     }
@@ -126,7 +122,7 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
 
     override fun stopScan() {
         Log.d(logTag, "stopScan()")
-        mutableStateFlowScanState.tryEmit(BleScanManager.State.Stopped)
+        mutableStateFlowScanState.tryEmit(AbstractBleScanManager.State.Stopped)
     }
 
     private fun generateRandomBle(bleDevice: BleDevice): BleGatt {
@@ -149,16 +145,16 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
         return BleGatt(bleDevice, services)
     }
 
-    override fun connect(address: String): BleGatt? {
+    override fun connectBle(address: String): BleGatt? {
         Log.d(logTag, "connect($address)")
-        scanResults.find { it.device.address == address }?.let { scanResult ->
+        bleScanResults.find { it.device.address == address }?.let { scanResult ->
             val bleGatt = generateRandomBle(scanResult.device)
-            mutableStateFlowConnectState.tryEmit(BleGattManager.State.Connected)
+            mutableStateFlowConnectState.tryEmit(AbstractBleGattManager.State.Connected)
             // mutableStateFlowBluetoothGatt.tryEmit(bleGatt)
             scope.launch {
-                mutableStateFlowConnectState.tryEmit(BleGattManager.State.Connecting)
+                mutableStateFlowConnectState.tryEmit(AbstractBleGattManager.State.Connecting)
                 delay(Random.nextLong(300, 1500))
-                mutableStateFlowConnectState.tryEmit(BleGattManager.State.Connected)
+                mutableStateFlowConnectState.tryEmit(AbstractBleGattManager.State.Connected)
             }
 
             return bleGatt
@@ -170,9 +166,9 @@ class FakeBleManager(context: Context, dispatcher: CoroutineDispatcher = Dispatc
     override fun disconnect() {
         Log.d(logTag, "disconnect()")
         scope.launch {
-            mutableStateFlowConnectState.tryEmit(BleGattManager.State.Disconnecting)
+            mutableStateFlowConnectState.tryEmit(AbstractBleGattManager.State.Disconnecting)
             delay(Random.nextLong(100, 500))
-            mutableStateFlowConnectState.tryEmit(BleGattManager.State.Disconnected)
+            mutableStateFlowConnectState.tryEmit(AbstractBleGattManager.State.Disconnected)
             // mutableStateFlowBleGatt.tryEmit(null)
         }
     }

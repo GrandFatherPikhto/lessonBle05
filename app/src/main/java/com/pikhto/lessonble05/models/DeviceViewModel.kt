@@ -5,12 +5,11 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pikhto.blin.BleGattManager
-import com.pikhto.blin.BleManagerInterface
+import com.pikhto.blin.orig.AbstractBleGattManager
 import com.pikhto.blin.buffer.BleCharacteristicNotify
 import com.pikhto.blin.data.BleBondState
-import com.pikhto.blin.data.BleGatt
 import com.pikhto.lessonble05.blemanager.AppBleManager
+import com.pikhto.lessonble05.data.BleGatt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,7 +20,7 @@ class DeviceViewModel: ViewModel () {
 
     private val tagLog = this.javaClass.simpleName
 
-    private val mutableStateFlowConnectState = MutableStateFlow(BleGattManager.State.Disconnected)
+    private val mutableStateFlowConnectState = MutableStateFlow(AbstractBleGattManager.State.Disconnected)
     val stateFlowConnectState get() = mutableStateFlowConnectState.asStateFlow()
     val connectState          get() = mutableStateFlowConnectState.value
 

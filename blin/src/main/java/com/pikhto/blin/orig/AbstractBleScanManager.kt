@@ -1,4 +1,4 @@
-package com.pikhto.blin
+package com.pikhto.blin.orig
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -14,18 +14,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.ParcelUuid
 import android.util.Log
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import com.pikhto.blin.data.BleScanResult
 import com.pikhto.blin.idling.ScanIdling
 import com.pikhto.blin.receivers.BcScanReceiver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class BleScanManager constructor(private val context: Context,
-                                 ioDispatcher: CoroutineDispatcher = Dispatchers.IO)
-    : DefaultLifecycleObserver {
+abstract class AbstractBleScanManager constructor(private val context: Context,
+                                         ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
     private val bcScanReceiver: BcScanReceiver = BcScanReceiver(this)
 
@@ -49,7 +45,7 @@ class BleScanManager constructor(private val context: Context,
     private val mutableSharedFlowScanResult = MutableSharedFlow<ScanResult>(replay = 100)
     val sharedFlowScanResult:SharedFlow<ScanResult> get() = mutableSharedFlowScanResult.asSharedFlow()
 
-    private val mutableSharedFlowBleScanResult = MutableSharedFlow<BleScanResult>(replay = 100)
+    private val mutableSharedFlowBleScanResult = MutableSharedFlow<ScanResult>(replay = 100)
     val sharedFlowBleScanResult get() = mutableSharedFlowBleScanResult.asSharedFlow()
 
     private val mutableStateFlowScanState = MutableStateFlow(State.Stopped)
@@ -121,7 +117,7 @@ class BleScanManager constructor(private val context: Context,
 
             if (stopTimeout > 0) {
                 scope.launch {
-                    this@BleScanManager.stopTimeout = stopTimeout
+                    this@AbstractBleScanManager.stopTimeout = stopTimeout
                     delay(stopTimeout)
                     stopScan()
                 }
@@ -152,17 +148,13 @@ class BleScanManager constructor(private val context: Context,
         }
     }
 
-
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        Log.d(tagLog, "onCreate()")
+    init {
         applicationContext.registerReceiver(bcScanReceiver, makeIntentFilters())
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
+    fun onDestroy() {
         applicationContext.unregisterReceiver(bcScanReceiver)
         stopScan()
-        super.onDestroy(owner)
     }
 
     private fun initScanFilters() {
@@ -219,7 +211,7 @@ class BleScanManager constructor(private val context: Context,
             ) {
                 if (isEmitScanResult(scanResult)) {
                     mutableSharedFlowScanResult.tryEmit(scanResult)
-                    mutableSharedFlowBleScanResult.tryEmit(BleScanResult(scanResult))
+                    mutableSharedFlowBleScanResult.tryEmit(scanResult)
                 }
                 if (stopOnFind &&
                     (names.isNotEmpty()

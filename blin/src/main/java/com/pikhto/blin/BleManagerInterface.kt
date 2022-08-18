@@ -3,27 +3,32 @@ package com.pikhto.blin
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import androidx.lifecycle.DefaultLifecycleObserver
+import android.bluetooth.le.ScanResult
 import com.pikhto.blin.buffer.BleCharacteristicNotify
 import com.pikhto.blin.data.BleGattItem
 import com.pikhto.blin.data.BleBondState
-import com.pikhto.blin.data.BleGatt
-import com.pikhto.blin.data.BleScanResult
+import com.pikhto.blin.orig.AbstractBleBondManager
+import com.pikhto.blin.orig.AbstractBleGattManager
+import com.pikhto.blin.orig.AbstractBleScanManager
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface BleManagerInterface {
-    val stateFlowScanState:StateFlow<BleScanManager.State>
-    val scanState:BleScanManager.State
+    val bleScanManager: AbstractBleScanManager
+    val bleGattManager: AbstractBleGattManager
+    val bleBondManager: AbstractBleBondManager
 
-    val sharedFlowBleScanResult: SharedFlow<BleScanResult>
-    val scanResults:List<BleScanResult>
+    val stateFlowScanState:StateFlow<AbstractBleScanManager.State>
+    val scanState: AbstractBleScanManager.State
+
+    val sharedFlowScanResults: SharedFlow<ScanResult>
+    val scanResults:List<ScanResult>
 
     val stateFlowScanError: StateFlow<Int>
     val scanError: Int
 
-    val stateFlowConnectState: StateFlow<BleGattManager.State>
-    val connectState: BleGattManager.State
+    val stateFlowConnectState: StateFlow<AbstractBleGattManager.State>
+    val connectState: AbstractBleGattManager.State
 
     val sharedFlowConnectStateCode: SharedFlow<Int>
 
@@ -53,7 +58,7 @@ interface BleManagerInterface {
 
     fun stopScan()
 
-    fun connect(address: String) : BleGatt?
+    fun connect(address: String) : BluetoothGatt?
     fun disconnect()
 
     fun writeGattData(bleGattData: BleGattItem)

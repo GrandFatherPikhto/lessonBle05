@@ -1,7 +1,7 @@
 package com.pikhto.blin.idling
 
 import androidx.test.espresso.IdlingResource
-import com.pikhto.blin.BleGattManager
+import com.pikhto.blin.orig.AbstractBleGattManager
 import com.pikhto.blin.BleManagerInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,10 +36,10 @@ class DisconnectingIdling (private val bleManager: BleManagerInterface): IdlingR
         scope.launch {
             bleManager.stateFlowConnectState.collect { state ->
                 when(state) {
-                    BleGattManager.State.Disconnected -> {
+                    AbstractBleGattManager.State.Disconnected -> {
                         idling = true
                     }
-                    BleGattManager.State.Disconnecting -> {
+                    AbstractBleGattManager.State.Disconnecting -> {
                         idling = false
                     }
                     else -> { }

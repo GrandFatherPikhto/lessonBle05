@@ -1,22 +1,22 @@
-package com.pikhto.blin
+package com.pikhto.blin.orig
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import com.pikhto.blin.data.BleGattItem
-import com.pikhto.blin.buffer.OutputBuffer
+import com.pikhto.blin.buffer.QueueBuffer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-class BleGattCallback constructor(private val bleGattManager: BleGattManager,
-                                  dispatcher: CoroutineDispatcher = Dispatchers.IO)
+abstract class AbstractBleGattCallback constructor(private val bleGattManager: AbstractBleGattManager,
+                                                   dispatcher: CoroutineDispatcher = Dispatchers.IO)
     : BluetoothGattCallback() {
 
     private val tagLog = this.javaClass.simpleName
     private val scope = CoroutineScope(dispatcher)
-    private val outputBuffer = OutputBuffer(this, dispatcher)
+    private val queueBuffer = QueueBuffer(this, dispatcher)
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         bleGattManager.onConnectionStateChange(gatt, status, newState)
@@ -26,7 +26,7 @@ class BleGattCallback constructor(private val bleGattManager: BleGattManager,
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
         super.onServicesDiscovered(gatt, status)
         gatt?.let { bluetoothGatt ->
-            outputBuffer.bluetoothGatt = bluetoothGatt
+            queueBuffer.bluetoothGatt = bluetoothGatt
         }
         bleGattManager.onGattDiscovered(gatt, status)
     }
@@ -36,7 +36,7 @@ class BleGattCallback constructor(private val bleGattManager: BleGattManager,
         characteristic: BluetoothGattCharacteristic?,
         status: Int
     ) {
-        outputBuffer.onCharacteristicWrite(gatt, characteristic, status)
+        queueBuffer.onCharacteristicWrite(gatt, characteristic, status)
         bleGattManager.onCharacteristicWrite(gatt, characteristic, status)
         super.onCharacteristicWrite(gatt, characteristic, status)
     }
@@ -46,7 +46,7 @@ class BleGattCallback constructor(private val bleGattManager: BleGattManager,
         descriptor: BluetoothGattDescriptor?,
         status: Int
     ) {
-        outputBuffer.onDescriptorWrite(gatt, descriptor, status)
+        queueBuffer.onDescriptorWrite(gatt, descriptor, status)
         bleGattManager.onDescriptorWrite(gatt, descriptor, status)
         super.onDescriptorWrite(gatt, descriptor, status)
     }
@@ -58,6 +58,7 @@ class BleGattCallback constructor(private val bleGattManager: BleGattManager,
     ) {
         super.onCharacteristicRead(gatt, characteristic, status)
         bleGattManager.onCharacteristicRead(gatt, characteristic, status)
+        queueBuffer.onCharacteristicRead(gatt, characteristic, status)
     }
 
     override fun onDescriptorRead(
@@ -67,6 +68,7 @@ class BleGattCallback constructor(private val bleGattManager: BleGattManager,
     ) {
         super.onDescriptorRead(gatt, descriptor, status)
         bleGattManager.onDescriptorRead(gatt, descriptor, status)
+        queueBuffer.onDescriptorRead(gatt, descriptor, status)
     }
 
     override fun onCharacteristicChanged(
@@ -85,5 +87,5 @@ class BleGattCallback constructor(private val bleGattManager: BleGattManager,
         super.onServiceChanged(gatt)
     }
 
-    fun writeGattData(bleGattData: BleGattItem) = outputBuffer.writeGattData(bleGattData)
+    fun writeGattData(bleGattData: BleGattItem) = queueBuffer.addGattData(bleGattData)
 }
