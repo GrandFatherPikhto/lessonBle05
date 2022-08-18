@@ -39,7 +39,6 @@ class QueueBuffer (dispatcher: CoroutineDispatcher = Dispatchers.IO) {
                         return gatt.readCharacteristic(characteristic)
                     }
                 }
-
             }
         }
 

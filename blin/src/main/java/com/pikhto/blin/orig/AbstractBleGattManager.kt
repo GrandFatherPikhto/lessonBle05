@@ -278,10 +278,10 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
         bluetoothGatt?.let { gatt ->
             bluetoothGattCharacteristic.getDescriptor(NOTIFY_DESCRIPTOR_UUID)
                 ?.let { bluetoothGattDescriptor ->
-                    gatt.setCharacteristicNotification(bluetoothGattCharacteristic, false)
                     bluetoothGattDescriptor.value =
                         BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
                     addGattData(BleGattItem(bluetoothGattDescriptor, BleGattItem.Type.Write))
+                    gatt.setCharacteristicNotification(bluetoothGattCharacteristic, false)
                 }
         }
     }
@@ -291,10 +291,10 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
         bluetoothGatt?.let { gatt ->
             bluetoothGattCharacteristic.getDescriptor(NOTIFY_DESCRIPTOR_UUID)
                 ?.let { bluetoothGattDescriptor ->
-                    gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true)
                     bluetoothGattDescriptor.value =
                         BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                     addGattData(BleGattItem(bluetoothGattDescriptor, BleGattItem.Type.Write))
+                    gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true)
                 }
         }
     }
@@ -321,7 +321,6 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
     @SuppressLint("MissingPermission")
     fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic) : Boolean {
         bluetoothGatt?.let { gatt ->
-            // return gatt.readCharacteristic(bluetoothGattCharacteristic)
             addGattData(BleGattItem(bluetoothGattCharacteristic, BleGattItem.Type.Read))
         }
 
@@ -331,7 +330,6 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
     @SuppressLint("MissingPermission")
     fun readDescriptor(bluetoothGattDescriptor: BluetoothGattDescriptor) : Boolean {
         bluetoothGatt?.let { gatt ->
-            // return gatt.readDescriptor(bluetoothGattDescriptor)
             addGattData(BleGattItem(bluetoothGattDescriptor, BleGattItem.Type.Read))
         }
 
