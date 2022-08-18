@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import com.pikhto.blin.orig.AbstractBleGattCallback
+import android.util.Log
 import com.pikhto.blin.data.BleGattItem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -12,8 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlin.properties.Delegates
 
-class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
-                   dispatcher: CoroutineDispatcher = Dispatchers.IO) {
+class QueueBuffer (dispatcher: CoroutineDispatcher = Dispatchers.IO) {
     private val tagLog = this.javaClass.simpleName
     private val scope = CoroutineScope(dispatcher)
     private val buffer = MutableListQueue<BleGattItem>()
@@ -22,7 +21,7 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
     var bluetoothGatt:BluetoothGatt? by Delegates.observable(null) { _, _, newValue ->
         newValue?.let { _ ->
             buffer.peek()?.let { nextGattData ->
-                nextBufferGattData(nextGattData)
+                nextGattData(nextGattData)
             }
         }
     }
@@ -67,7 +66,7 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
     }
 
 
-    private fun nextBufferGattData(bleGattData: BleGattItem) : Boolean {
+    private fun nextGattData(bleGattData: BleGattItem) : Boolean {
         return if (bleGattData.uuidDescriptor == null) {
             nextCharacteristic(bleGattData)
         } else {
@@ -75,11 +74,12 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
         }
     }
 
-    private fun nextGattData(bleGattData: BleGattItem) {
+    private fun nextBufferGattData(bleGattData: BleGattItem) {
+        Log.d(tagLog, "nextBufferGattData($bleGattData, ${buffer.peek()})")
         if (buffer.peek() == bleGattData) {
             buffer.dequeue()
             buffer.peek()?.let { nextGattData ->
-                nextBufferGattData(nextGattData)
+                nextGattData(nextGattData)
             }
         }
     }
@@ -89,11 +89,11 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
                                status: Int) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             if (gatt != null && characteristic != null) {
-                nextGattData(BleGattItem(characteristic))
+                nextBufferGattData(BleGattItem(characteristic, BleGattItem.Type.Write))
             }
         } else {
             if (gatt != null && characteristic != null) {
-                nextGattData(BleGattItem(characteristic))
+                nextBufferGattData(BleGattItem(characteristic, BleGattItem.Type.Write))
             }
         }
     }
@@ -104,11 +104,11 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
             if (gatt != null && descriptor != null) {
-                nextGattData(BleGattItem(descriptor))
+                nextBufferGattData(BleGattItem(descriptor, BleGattItem.Type.Write))
             }
         } else {
             if (gatt != null && descriptor != null) {
-                nextBufferGattData(BleGattItem(descriptor))
+                nextGattData(BleGattItem(descriptor, BleGattItem.Type.Write))
             }
         }
     }
@@ -120,7 +120,7 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             if (gatt != null && characteristic != null) {
-                nextGattData(BleGattItem(characteristic))
+                nextBufferGattData(BleGattItem(characteristic, BleGattItem.Type.Read))
             }
         } else {
             if (gatt != null && characteristic != null) {
@@ -136,7 +136,7 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             if (gatt != null && descriptor != null) {
-                nextGattData(BleGattItem(descriptor))
+                nextBufferGattData(BleGattItem(descriptor, BleGattItem.Type.Read))
             }
         } else {
             if (gatt != null && descriptor != null) {
@@ -146,6 +146,7 @@ class QueueBuffer (private val bleGattCallback: AbstractBleGattCallback,
     }
 
     fun addGattData(bleGattItem: BleGattItem) {
+        Log.d(tagLog, "addGattData($bleGattItem)")
         buffer.enqueue(bleGattItem)
         if (buffer.count == 1) {
             nextGattData(bleGattItem)

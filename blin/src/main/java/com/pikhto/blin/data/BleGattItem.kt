@@ -17,24 +17,24 @@ data class BleGattItem (val uuidService: UUID,
         Read(0x02),
     }
 
-    constructor(bluetoothGattService: BluetoothGattService, type: Type = Type.Write) : this(
+    constructor(bluetoothGattService: BluetoothGattService, type: Type) : this(
                 uuidService = bluetoothGattService.uuid,
                 type = type
             )
 
-    constructor(bluetoothGattCharacteristic: BluetoothGattCharacteristic, type: Type = Type.Write) :
+    constructor(bluetoothGattCharacteristic: BluetoothGattCharacteristic, type: Type) :
             this(uuidService = bluetoothGattCharacteristic.service.uuid,
                 uuidCharacteristic = bluetoothGattCharacteristic.uuid,
                 value = bluetoothGattCharacteristic.value,
                 type = type
             )
 
-    constructor(bluetoothGattDescriptor: BluetoothGattDescriptor, type: Type = Type.Write) :
+    constructor(bluetoothGattDescriptor: BluetoothGattDescriptor, type: Type) :
             this(uuidService = bluetoothGattDescriptor.characteristic.service.uuid,
                 uuidCharacteristic = bluetoothGattDescriptor.characteristic.uuid,
                 uuidDescriptor = bluetoothGattDescriptor.uuid,
                 value = bluetoothGattDescriptor.value,
-                type = Type.Write
+                type = type
             )
 
     fun getService(bluetoothGatt: BluetoothGatt) : BluetoothGattService? =

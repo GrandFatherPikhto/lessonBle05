@@ -173,24 +173,11 @@ class FakeBleManager(context: Context) : AppBleManager (context) {
         }
     }
 
-    override fun writeGattData(bleGattData: BleGattItem) {
+    override fun addGattData(bleGattData: BleGattItem) {
 
-    }
-
-    override fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic) : Boolean {
-        return  false
-
-    }
-
-    override fun readGattData(bleGattData: BleGattItem): Boolean {
-        return false
     }
 
     override fun notifyCharacteristic(bleGattData: BleGattItem) { }
-
-    override fun readDescriptor(bluetoothGattDescriptor: BluetoothGattDescriptor) : Boolean {
-        return false
-    }
 
     override fun notifyCharacteristic(
         bluetoothGattCharacteristic: BluetoothGattCharacteristic) {

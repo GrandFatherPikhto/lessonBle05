@@ -281,7 +281,7 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
                     gatt.setCharacteristicNotification(bluetoothGattCharacteristic, false)
                     bluetoothGattDescriptor.value =
                         BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
-                    addGattData(BleGattItem(bluetoothGattDescriptor))
+                    addGattData(BleGattItem(bluetoothGattDescriptor, BleGattItem.Type.Write))
                 }
         }
     }
@@ -294,7 +294,7 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
                     gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true)
                     bluetoothGattDescriptor.value =
                         BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    addGattData(BleGattItem(bluetoothGattDescriptor))
+                    addGattData(BleGattItem(bluetoothGattDescriptor, BleGattItem.Type.Write))
                 }
         }
     }
@@ -321,34 +321,18 @@ abstract class AbstractBleGattManager constructor(private val context: Context,
     @SuppressLint("MissingPermission")
     fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic) : Boolean {
         bluetoothGatt?.let { gatt ->
-            return gatt.readCharacteristic(bluetoothGattCharacteristic)
+            // return gatt.readCharacteristic(bluetoothGattCharacteristic)
+            addGattData(BleGattItem(bluetoothGattCharacteristic, BleGattItem.Type.Read))
         }
 
         return false
     }
-
-    @SuppressLint("MissingPermission")
-    fun readGattData(bleGattData: BleGattItem) : Boolean {
-        bluetoothGatt?.let { gatt ->
-            gatt.getService(bleGattData.uuidService)?.let { service ->
-                service.getCharacteristic(bleGattData.uuidCharacteristic)?.let { characteristic ->
-                    if (bleGattData.uuidDescriptor == null) return readCharacteristic(characteristic)
-                    else characteristic.getDescriptor(bleGattData.uuidDescriptor)?.let { descriptor ->
-                        return readDescriptor(descriptor)
-                    }
-                }
-            }
-        }
-
-        return false
-    }
-
-
 
     @SuppressLint("MissingPermission")
     fun readDescriptor(bluetoothGattDescriptor: BluetoothGattDescriptor) : Boolean {
         bluetoothGatt?.let { gatt ->
-            return gatt.readDescriptor(bluetoothGattDescriptor)
+            // return gatt.readDescriptor(bluetoothGattDescriptor)
+            addGattData(BleGattItem(bluetoothGattDescriptor, BleGattItem.Type.Read))
         }
 
         return false

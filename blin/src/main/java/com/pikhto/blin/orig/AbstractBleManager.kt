@@ -87,16 +87,10 @@ abstract class AbstractBleManager constructor(private val context: Context,
 
     override fun disconnect() = bleGattManager.disconnect()
 
-    override fun writeGattData(bleGattData: BleGattItem) = bleGattManager.addGattData(bleGattData)
+    override fun addGattData(bleGattData: BleGattItem) = bleGattManager.addGattData(bleGattData)
 
     override fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic)
         = bleGattManager.readCharacteristic(bluetoothGattCharacteristic)
-
-    override fun readGattData(bleGattData: BleGattItem): Boolean =
-        bleGattManager.readGattData(bleGattData)
-
-    override fun readDescriptor(bluetoothGattDescriptor: BluetoothGattDescriptor)
-        = bleGattManager.readDescriptor(bluetoothGattDescriptor)
 
     override fun notifyCharacteristic(
         bluetoothGattCharacteristic: BluetoothGattCharacteristic)

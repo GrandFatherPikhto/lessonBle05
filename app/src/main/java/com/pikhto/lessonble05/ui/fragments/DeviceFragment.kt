@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.pikhto.blin.data.BleGattItem
 import com.pikhto.blin.orig.AbstractBleBondManager
 import com.pikhto.blin.orig.AbstractBleGattManager
 import com.pikhto.lessonble05.LessonBle05App
@@ -191,7 +192,7 @@ class DeviceFragment : Fragment() {
         }
 
         rvBleDeviceAdapter.setOnCharacteristicReadClickListener { bleItem, _ ->
-            bleManager.readGattData(bleItem.bleGattData)
+            bleManager.addGattData(bleItem.bleReadGattData)
         }
 
         rvBleDeviceAdapter.setOnCharacteristicWriteClickListener { bleItem, _ ->
@@ -200,18 +201,18 @@ class DeviceFragment : Fragment() {
                 value?.let { characteristicValue ->
                     Log.d(tagLog, characteristicValue.joinToString(",") { String.format("%02X", it)})
                     bleItem.value = characteristicValue
-                    bleManager.writeGattData(bleItem.bleGattData)
+                    bleManager.addGattData(bleItem.bleWriteGattData)
                 }
             }
             sendDialogFragment.show(requireActivity().supportFragmentManager, "Dialog")
         }
 
         rvBleDeviceAdapter.setOnCharacteristicNotifyClickListener { bleItem, _ ->
-            bleManager.notifyCharacteristic(bleItem.bleGattData)
+            bleManager.notifyCharacteristic(bleItem.bleReadGattData)
         }
 
         rvBleDeviceAdapter.setOnDescriptorReadClickListener { bleItem, _ ->
-            bleManager.readGattData(bleItem.bleGattData)
+            bleManager.addGattData(bleItem.bleReadGattData)
         }
 
         lifecycleScope.launch {

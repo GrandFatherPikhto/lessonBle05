@@ -61,11 +61,9 @@ interface BleManagerInterface {
     fun connect(address: String) : BluetoothGatt?
     fun disconnect()
 
-    fun writeGattData(bleGattData: BleGattItem)
+    fun addGattData(bleGattData: BleGattItem)
 
     fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic) : Boolean
-    fun readDescriptor(bluetoothGattDescriptor: BluetoothGattDescriptor) : Boolean
-    fun readGattData(bleGattData: BleGattItem): Boolean
     fun notifyCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic)
     fun notifyCharacteristic(bleGattData: BleGattItem)
     fun isCharacteristicNotified(bluetoothGattCharacteristic: BluetoothGattCharacteristic) : Boolean

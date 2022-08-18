@@ -16,7 +16,7 @@ abstract class AbstractBleGattCallback constructor(private val bleGattManager: A
 
     private val tagLog = this.javaClass.simpleName
     private val scope = CoroutineScope(dispatcher)
-    private val queueBuffer = QueueBuffer(this, dispatcher)
+    private val queueBuffer = QueueBuffer(dispatcher)
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         bleGattManager.onConnectionStateChange(gatt, status, newState)
