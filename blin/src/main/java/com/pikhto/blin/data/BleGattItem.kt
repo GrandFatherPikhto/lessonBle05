@@ -18,9 +18,9 @@ data class BleGattItem (val uuidService: UUID,
     }
 
     constructor(bluetoothGattService: BluetoothGattService, type: Type) : this(
-                uuidService = bluetoothGattService.uuid,
-                type = type
-            )
+        uuidService = bluetoothGattService.uuid,
+        type = type
+    )
 
     constructor(bluetoothGattCharacteristic: BluetoothGattCharacteristic, type: Type) :
             this(uuidService = bluetoothGattCharacteristic.service.uuid,
@@ -44,20 +44,17 @@ data class BleGattItem (val uuidService: UUID,
         if (uuidCharacteristic == null) {
             null
         } else {
-            bluetoothGatt.getService(uuidService)?.let { service ->
-                service.getCharacteristic(uuidCharacteristic)
-            }
+            bluetoothGatt.getService(uuidService)
+                ?.getCharacteristic(uuidCharacteristic)
         }
 
     fun getDescriptor(bluetoothGatt: BluetoothGatt) : BluetoothGattDescriptor? =
         if (uuidCharacteristic == null && uuidDescriptor == null) {
             null
         } else {
-            bluetoothGatt.getService(uuidService)?.let { service ->
-                service.getCharacteristic(uuidCharacteristic)?.let { characteristic ->
-                    characteristic.getDescriptor(uuidDescriptor)
-                }
-            }
+            bluetoothGatt.getService(uuidService)
+                ?.getCharacteristic(uuidCharacteristic)
+                ?.getDescriptor(uuidDescriptor)
         }
 
     override fun equals(other: Any?): Boolean {
