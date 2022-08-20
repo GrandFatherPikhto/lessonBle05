@@ -1,5 +1,6 @@
 package com.pikhto.blin.receivers
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanResult
@@ -12,6 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
+@SuppressLint("UnspecifiedImmutableFlag")
 class BcScanReceiver constructor(private val bleScanManager: AbstractBleScanManager, dispatcher: CoroutineDispatcher = Dispatchers.IO): BroadcastReceiver() {
     companion object {
         const val ACTION_BLE_SCAN = "com.pikhto.blescan.ACTION_BLE_SCAN"
